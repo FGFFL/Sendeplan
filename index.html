@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kalender mit Speicherung</title>
+  <link rel="stylesheet" href="kalender.css">
+</head>
+<body>
+  <div class="controls">
+    <label for="viewSelector">Ansicht:
+      <select id="viewSelector" aria-label="Ansichtsauswahl">
+        <option value="1">Tag</option>
+        <option value="7" selected>Woche</option>
+        <option value="30">Monat</option>
+      </select>
+    </label>
+    <label for="startDatePicker">Startdatum:
+      <input type="date" id="startDatePicker" aria-label="Startdatum" />
+    </label>
+    <button id="updateView" aria-label="Ansicht aktualisieren">Aktualisieren</button>
+  </div>
+
+  <div class="calendar-wrapper">
+    <div class="calendar" id="calendar"></div>
+  </div>
+
+  <div class="pool">
+    <strong>Beitragspool:</strong>
+    <span class="beitrag-pool" draggable="true" data-color="#28a745">Beitrag A</span>
+    <span class="beitrag-pool" draggable="true" data-color="#dc3545">Beitrag B</span>
+    <span class="beitrag-pool" draggable="true" data-color="#ffc107">Beitrag C</span>
+  </div>
+
+  <script src="kalender.js"></script>
+</body>
+</html>
