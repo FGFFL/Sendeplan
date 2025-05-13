@@ -1,18 +1,10 @@
 
-// === DOM Elemente ===
 const calendar = document.getElementById('calendar');
 const viewSelector = document.getElementById('viewSelector');
 const startDatePicker = document.getElementById('startDatePicker');
 const updateView = document.getElementById('updateView');
-const addBeitragBtn = document.getElementById('addBeitragBtn');
-const beitragDialog = document.getElementById('beitragDialog');
-const newBeitragText = document.getElementById('newBeitragText');
-const newBeitragColor = document.getElementById('newBeitragColor');
-const poolItems = document.getElementById('poolItems');
-const cancelBeitrag = document.getElementById('cancelBeitrag');
-
 const rows = 40;
-let calendarData = {}; // id: { text, color, span }
+let calendarData = {}; // { "2025-05-07_5": { text, color } }
 
 function getWeekDates(startDate, days) {
   const result = [];
@@ -39,21 +31,26 @@ function saveData() {
 
 function loadData() {
   const data = localStorage.getItem('calendarData');
-  if (data) calendarData = JSON.parse(data);
+  if (data) {
+    calendarData = JSON.parse(data);
+  }
 }
 
 function createHeader(dates) {
   const header = document.createElement('div');
   header.className = 'calendar-header';
+
   const spHeader = document.createElement('div');
   spHeader.textContent = 'Sendeplatz';
   spHeader.className = 'sendeplatz-cell';
   header.appendChild(spHeader);
+
   dates.forEach(d => {
     const div = document.createElement('div');
     div.textContent = formatDate(d);
     header.appendChild(div);
   });
+
   return header;
 }
 
@@ -63,99 +60,50 @@ function createCell(date, rowIdx) {
   const dateKey = getDateKey(date);
   const id = `${dateKey}_${rowIdx}`;
   cell.dataset.id = id;
+
   cell.addEventListener('dragover', e => e.preventDefault());
   cell.addEventListener('drop', handleDrop);
 
   if (calendarData[id]) {
-    const beitrag = createBeitrag(calendarData[id].text, calendarData[id].color, id, calendarData[id].span || 1);
-    beitrag.style.gridColumn = `span ${calendarData[id].span || 1}`;
+    const beitrag = createBeitragElement(calendarData[id].text, calendarData[id].color, id);
     cell.appendChild(beitrag);
   }
+
   return cell;
 }
 
-function createBeitrag(text, color, id, span = 1) {
+function createBeitragElement(text, color, id) {
   const beitrag = document.createElement('div');
   beitrag.className = 'beitrag';
   beitrag.textContent = text;
   beitrag.style.backgroundColor = color;
-  beitrag.setAttribute('draggable', 'true');
+  beitrag.title = `Beitrag: ${text}`;
 
-  const removeBtn = document.createElement('button');
-  removeBtn.textContent = '✖';
-  removeBtn.className = 'remove';
-  removeBtn.onclick = (e) => {
-    e.stopPropagation();
-    beitrag.remove();
-    delete calendarData[id];
-    saveData();
-  };
-
-  beitrag.appendChild(removeBtn);
-
-  beitrag.addEventListener('dragstart', (e) => {
-    e.dataTransfer.setData('text/plain', text);
-    e.dataTransfer.setData('color', color);
-    e.dataTransfer.setData('sourceId', id);
-  });
-
-    addResizeHandle(beitrag, id);
-  return beitrag;
-
-function addResizeHandle(beitrag, id) {
-  const grip = document.createElement('div');
-  grip.style.position = 'absolute';
-  grip.style.right = '0';
-  grip.style.top = '0';
-  grip.style.width = '6px';
-  grip.style.height = '100%';
-  grip.style.cursor = 'ew-resize';
-  grip.style.zIndex = '10';
-  beitrag.appendChild(grip);
-
-  let isResizing = false;
-  let startX = 0;
-  let startSpan = 1;
-
-  grip.addEventListener('mousedown', (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    isResizing = true;
-    startX = e.clientX;
-    startSpan = calendarData[id]?.span || 1;
-    document.body.style.cursor = 'ew-resize';
-  });
-
-  document.addEventListener('mousemove', (e) => {
-    if (!isResizing) return;
-    const dx = e.clientX - startX;
-    const cellWidth = document.querySelector('.calendar-cell')?.offsetWidth || 100;
-    const diff = Math.round(dx / cellWidth);
-    const newSpan = Math.max(1, startSpan + diff);
-    beitrag.style.gridColumn = `span ${newSpan}`;
-  });
-
-  document.addEventListener('mouseup', () => {
-    if (isResizing) {
-      const currentSpan = parseInt(beitrag.style.gridColumn.split(' ')[1]) || 1;
-      calendarData[id].span = currentSpan;
+  beitrag.addEventListener('dblclick', () => {
+    const cell = beitrag.parentElement;
+    if (cell) {
+      cell.innerHTML = '';
+      delete calendarData[id];
       saveData();
-      isResizing = false;
-      document.body.style.cursor = 'default';
     }
   });
-}
 
+  return beitrag;
 }
 
 function createRow(dates, rowIdx) {
   const row = document.createElement('div');
   row.className = 'calendar-row';
+
   const label = document.createElement('div');
   label.className = 'sendeplatz-cell';
   label.textContent = `Platz ${rowIdx + 1}`;
   row.appendChild(label);
-  dates.forEach(date => row.appendChild(createCell(date, rowIdx)));
+
+  dates.forEach(date => {
+    row.appendChild(createCell(date, rowIdx));
+  });
+
   return row;
 }
 
@@ -164,7 +112,9 @@ function createGrid(startDate, days) {
   const weekDates = getWeekDates(startDate, cols);
   calendar.innerHTML = '';
   calendar.style.setProperty('--cols', cols);
+
   calendar.appendChild(createHeader(weekDates));
+
   for (let r = 0; r < rows; r++) {
     calendar.appendChild(createRow(weekDates, r));
   }
@@ -173,21 +123,20 @@ function createGrid(startDate, days) {
 function handleDrop(e) {
   const type = e.dataTransfer.getData('text/plain');
   const color = e.dataTransfer.getData('color');
-  const sourceId = e.dataTransfer.getData('sourceId');
   const cell = e.currentTarget;
   const id = cell.dataset.id;
 
-  const beitrag = createBeitrag(type, color, id);
+  const beitrag = createBeitragElement(type, color, id);
   cell.innerHTML = '';
   cell.appendChild(beitrag);
 
-  calendarData[id] = { text: type, color, span: 1 };
-  if (sourceId && sourceId !== id) delete calendarData[sourceId];
+  calendarData[id] = { text: type, color };
   saveData();
 }
 
 function initDragAndDrop() {
-  poolItems.querySelectorAll('.beitrag-pool').forEach(item => {
+  const items = document.querySelectorAll('.beitrag-pool');
+  items.forEach(item => {
     item.addEventListener('dragstart', e => {
       e.dataTransfer.setData('text/plain', item.textContent);
       e.dataTransfer.setData('color', item.dataset.color);
@@ -195,36 +144,15 @@ function initDragAndDrop() {
   });
 }
 
-function addPoolBeitrag(text, color) {
-  const span = document.createElement('span');
-  span.className = 'beitrag-pool';
-  span.textContent = text;
-  span.setAttribute('draggable', 'true');
-  span.dataset.color = color;
-  span.style.backgroundColor = color;
-
-  const removeBtn = document.createElement('button');
-  removeBtn.textContent = '✖';
-  removeBtn.className = 'remove';
-  removeBtn.onclick = () => span.remove();
-  span.appendChild(removeBtn);
-
-  poolItems.appendChild(span);
-  initDragAndDrop();
+function getSelectedDate() {
+  const dateStr = startDatePicker.value;
+  return dateStr ? new Date(dateStr) : new Date();
 }
 
-addBeitragBtn.addEventListener('click', () => beitragDialog.showModal());
-cancelBeitrag.addEventListener('click', () => beitragDialog.close());
-
-beitragDialog.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const text = newBeitragText.value.trim();
-  const color = newBeitragColor.value;
-  if (text) {
-    addPoolBeitrag(text, color);
-    beitragDialog.close();
-    newBeitragText.value = '';
-  }
+updateView.addEventListener('click', () => {
+  const days = viewSelector.value;
+  const startDate = getSelectedDate();
+  createGrid(startDate, days);
 });
 
 const todayStr = new Date().toISOString().split('T')[0];
@@ -232,9 +160,3 @@ startDatePicker.value = todayStr;
 loadData();
 createGrid(new Date(), viewSelector.value);
 initDragAndDrop();
-
-updateView.addEventListener('click', () => {
-  const days = viewSelector.value;
-  const startDate = new Date(startDatePicker.value);
-  createGrid(startDate, days);
-});
