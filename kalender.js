@@ -99,7 +99,53 @@ function createBeitrag(text, color, id, span = 1) {
     e.dataTransfer.setData('sourceId', id);
   });
 
+    addResizeHandle(beitrag, id);
   return beitrag;
+
+function addResizeHandle(beitrag, id) {
+  const grip = document.createElement('div');
+  grip.style.position = 'absolute';
+  grip.style.right = '0';
+  grip.style.top = '0';
+  grip.style.width = '6px';
+  grip.style.height = '100%';
+  grip.style.cursor = 'ew-resize';
+  grip.style.zIndex = '10';
+  beitrag.appendChild(grip);
+
+  let isResizing = false;
+  let startX = 0;
+  let startSpan = 1;
+
+  grip.addEventListener('mousedown', (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    isResizing = true;
+    startX = e.clientX;
+    startSpan = calendarData[id]?.span || 1;
+    document.body.style.cursor = 'ew-resize';
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!isResizing) return;
+    const dx = e.clientX - startX;
+    const cellWidth = document.querySelector('.calendar-cell')?.offsetWidth || 100;
+    const diff = Math.round(dx / cellWidth);
+    const newSpan = Math.max(1, startSpan + diff);
+    beitrag.style.gridColumn = `span ${newSpan}`;
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (isResizing) {
+      const currentSpan = parseInt(beitrag.style.gridColumn.split(' ')[1]) || 1;
+      calendarData[id].span = currentSpan;
+      saveData();
+      isResizing = false;
+      document.body.style.cursor = 'default';
+    }
+  });
+}
+
 }
 
 function createRow(dates, rowIdx) {
