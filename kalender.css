@@ -14,7 +14,7 @@ body {
 }
 
 .calendar-wrapper {
-  height: calc(100vh - 220px);
+  height: calc(100vh - 170px);
   overflow: auto;
 }
 
@@ -55,24 +55,13 @@ body {
 
 .beitrag {
   position: absolute;
-  top: 2px; bottom: 2px; left: 2px;
+  top: 2px; bottom: 2px; left: 2px; right: 2px;
   background: #28a745;
   color: white;
-  padding: 4px 24px 4px 8px;
+  padding: 4px;
   font-size: 0.8rem;
   border-radius: 4px;
   cursor: move;
-  display: flex;
-  align-items: center;
-}
-
-.beitrag .remove {
-  margin-left: auto;
-  background: none;
-  border: none;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
 }
 
 .pool {
@@ -92,23 +81,6 @@ body {
   border-radius: 4px;
   cursor: grab;
   font-size: 0.75rem;
-  position: relative;
-}
-
-.pool .beitrag-pool .remove {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  background: red;
-  border: none;
-  color: white;
-  font-size: 0.6rem;
-  border-radius: 50%;
-  cursor: pointer;
-  width: 16px;
-  height: 16px;
-  line-height: 14px;
-  text-align: center;
 }
 
 @media (max-width: 768px) {
