@@ -240,8 +240,10 @@ function applyWeekTemplate(name, baseDate) {
   const data = localStorage.getItem(`weekTemplate_${name}`);
   if (!data) return alert("Vorlage nicht gefunden.");
   const original = JSON.parse(data);
-  const sourceDateKeys = Object.keys(original).map(k => k.split('_')[0]);
-  const sourceStartDate = new Date(sourceDateKeys.sort()[0]);
+const sourceDateKeys = Object.keys(original).map(k => k.split('_')[0]);
+const firstDate = new Date(sourceDateKeys.sort()[0]);
+const sourceStartDate = getMonday(firstDate); // <- DAS ist der richtige Wochenbeginn
+
   const targetDates = getWeekRange(baseDate).map(getDateKey);
   targetDates.forEach(dateKey => {
     for (let row = 0; row < rows; row++) delete calendarData[`${dateKey}_${row}`];
@@ -364,6 +366,7 @@ document.getElementById('addBeitragBtn').addEventListener('click', () => {
 function getSelectedDate() {
   return currentStartDate;
 }
+
 
 document.getElementById('goToTodayBtn').addEventListener('click', () => {
   const view = viewSelector.value;
