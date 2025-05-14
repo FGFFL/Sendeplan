@@ -1,0 +1,294 @@
+:root {
+  --primary: #009DD4;
+  --success: #28a745;
+  --danger: red;
+
+  /* Optional: Corporate-Farben vorbereiten */
+  --corporate-red: #D50C2F;
+  --corporate-green: #76B828;
+  --corporate-blue: #009DD4;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  background: #f4f6f8;
+  color: #333;
+  margin: 0;
+}
+
+/* Layout-Grundstruktur */
+.layout {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1rem;
+  align-items: flex-start;
+}
+
+.calendar-wrapper {
+  flex: 1;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  padding: 1rem;
+  max-width: 100%;
+  overflow: auto;
+}
+
+.pool {
+  width: 280px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  padding: 1rem;
+  flex-shrink: 0;
+}
+
+/* Kopfzeile und Navigation */
+.controls {
+  padding: 1rem;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.week-template-controls {
+  margin-left: auto;
+  display: flex;
+  gap: 0.5rem;
+  backround: #009DD4
+}
+
+.date-navigation button {
+  background: #009DD4;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#currentRange {
+  font-weight: bold;
+}
+
+/* Kalenderstruktur */
+.calendar {
+  display: flex;
+  flex-direction: column;
+}
+
+.calendar-header, .calendar-row {
+  display: grid;
+  grid-template-columns: 150px repeat(var(--cols, 7), 1fr);
+}
+
+.calendar-header div {
+  background: #e0e0e0;
+  padding: 8px;
+  text-align: center;
+  border-right: 1px solid #ccc;
+  font-weight: bold;
+  border-bottom: 1px solid #bbb;
+}
+
+.sendeplatz-cell {
+  background: #f1f1f7;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.calendar-cell {
+  height: 40px;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  position: relative;
+  background: white;
+}
+
+/* +Button in Zellen */
+.cell-add-btn {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  color: #555;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 2;
+  line-height: 0;
+}
+
+.calendar-cell:hover .cell-add-btn {
+  display: block;
+}
+
+/* Beitrag in Kalender-Zelle */
+.beitrag {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 2px;
+  right: 2px;
+  background: var(--success);
+  color: white;
+  padding: 4px;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  cursor: move;
+}
+
+/* Beitragspool */
+#beitragPoolContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.pool .beitrag-pool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 4px;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  background: var(--success);
+  color: white;
+  cursor: grab;
+  position: relative;
+  width: 100%;
+  max-width: 150px;
+}
+
+/* Lösch-Button */
+.beitrag-pool .delete-btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: var(--danger);
+  color: white;
+  font-size: 10px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+}
+
+/* Modal */
+#beitragModal input[type="text"] {
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+/* Buttons */
+#addBeitragBtn {
+  margin-left: 1rem;
+  background: #009DD4;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#weekTemplateSelect {
+  padding: 0.2rem;
+  font-size: 0.9rem;
+}
+
+#createWeekTemplateBtn,
+#applyWeekTemplateBtn,
+#deleteWeekTemplateBtn {
+  padding: 0.2rem 0.5rem;
+  font-size: 0.9rem;
+  background: #009DD4;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Hover Schatten */
+.beitrag-block {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  height: calc(100% - 4px);
+  border-radius: 4px;
+  padding: 4px;
+  font-size: 0.8rem;
+  color: white;
+  cursor: move;
+  display: flex;
+  align-items: center;
+  z-index: 1;
+  transition: box-shadow 0.2s;
+}
+
+.beitrag-block:hover {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+#goToTodayBtn {
+  background: #009DD4;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.4rem 0.6rem;
+  cursor: pointer;
+}
+
+#beitragModal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border: 1px solid #ccc;
+  padding: 1rem;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  display: none;
+}
+
+
+/* Responsive */
+@media (max-width: 900px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .pool {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .calendar-cell {
+    height: 50px;
+  }
+}
