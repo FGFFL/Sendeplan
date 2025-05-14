@@ -380,6 +380,16 @@ document.getElementById('goToTodayBtn').addEventListener('click', () => {
   updateCalendarView();
 });
 
+document.getElementById('clearAllBtn').addEventListener('click', () => {
+  if (confirm("Willst du wirklich alle Beiträge im Kalender löschen? Das kann nicht rückgängig gemacht werden.")) {
+    calendarData = {};                  // Daten zurücksetzen
+    localStorage.removeItem('calendarData');  // aus LocalStorage löschen
+    updateCalendarView();              // UI aktualisieren
+    alert("Alle Beiträge wurden gelöscht.");
+  }
+});
+
+
 // Initialisierung
 updateTemplateDropdown();
 toggleWeekTemplateControls();
