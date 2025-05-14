@@ -2,11 +2,6 @@
   --primary: #009DD4;
   --success: #28a745;
   --danger: red;
-
-  /* Optional: Corporate-Farben vorbereiten */
-  --corporate-red: #D50C2F;
-  --corporate-green: #76B828;
-  --corporate-blue: #009DD4;
 }
 
 body {
@@ -16,6 +11,8 @@ body {
   background: #f4f6f8;
   color: #333;
   margin: 0;
+  padding: 0;
+  height: auto;
 }
 
 /* Layout-Grundstruktur */
@@ -24,6 +21,7 @@ body {
   gap: 1.5rem;
   padding: 1rem;
   align-items: flex-start;
+  height: auto;
 }
 
 .calendar-wrapper {
@@ -33,7 +31,9 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   padding: 1rem;
   max-width: 100%;
-  overflow: auto;
+  overflow: visible; /* keine Scrollbar */
+  transform: scale(0.9); /* optional: alles etwas kleiner */
+  transform-origin: top left;
 }
 
 .pool {
@@ -59,7 +59,6 @@ body {
   margin-left: auto;
   display: flex;
   gap: 0.5rem;
-  backround: #009DD4
 }
 
 .date-navigation button {
@@ -75,7 +74,6 @@ body {
   font-weight: bold;
 }
 
-/* Kalenderstruktur */
 .calendar {
   display: flex;
   flex-direction: column;
@@ -113,7 +111,6 @@ body {
   background: white;
 }
 
-/* +Button in Zellen */
 .cell-add-btn {
   display: none;
   position: absolute;
@@ -137,7 +134,6 @@ body {
   display: block;
 }
 
-/* Beitrag in Kalender-Zelle */
 .beitrag {
   position: absolute;
   top: 2px;
@@ -176,7 +172,6 @@ body {
   max-width: 150px;
 }
 
-/* Lösch-Button */
 .beitrag-pool .delete-btn {
   position: absolute;
   top: -6px;
@@ -191,13 +186,11 @@ body {
   height: 16px;
 }
 
-/* Modal */
 #beitragModal input[type="text"] {
   width: 100%;
   margin-bottom: 0.5rem;
 }
 
-/* Buttons */
 #addBeitragBtn {
   margin-left: 1rem;
   background: #009DD4;
@@ -227,23 +220,6 @@ body {
   cursor: pointer;
 }
 
-/* Hover Schatten */
-.beitrag-block {
-  position: absolute;
-  top: 2px;
-  bottom: 2px;
-  height: calc(100% - 4px);
-  border-radius: 4px;
-  padding: 4px;
-  font-size: 0.8rem;
-  color: white;
-  cursor: move;
-  display: flex;
-  align-items: center;
-  z-index: 1;
-  transition: box-shadow 0.2s;
-}
-
 .beitrag-block:hover {
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
@@ -270,8 +246,6 @@ body {
   display: none;
 }
 
-
-/* Responsive */
 @media (max-width: 900px) {
   .layout {
     flex-direction: column;
