@@ -362,7 +362,7 @@ document.getElementById('addBeitragBtn').addEventListener('click', () => {
 });
 
 function getSelectedDate() {
-  return dateStr ? new Date(dateStr) : new Date();
+  return currentStartDate;
 }
 
 document.getElementById('goToTodayBtn').addEventListener('click', () => {
