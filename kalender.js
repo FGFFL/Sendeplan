@@ -1,7 +1,7 @@
 const calendar = document.getElementById('calendar');
 const viewSelector = document.getElementById('viewSelector');
 const startDatePicker = document.getElementById('startDatePicker');
-const rows = 40;
+let rows = 40;
 let calendarData = {};
 let currentStartDate = new Date();
 let activeCellId = null;
@@ -66,12 +66,16 @@ function getDateKey(date) {
 
 function saveData() {
   localStorage.setItem('calendarData', JSON.stringify(calendarData));
+  localStorage.setItem('calendarRowCount', rows);
 }
 
 function loadData() {
   const data = localStorage.getItem('calendarData');
   if (data) {
     calendarData = JSON.parse(data);
+    
+    const storedRows = localStorage.getItem('calendarRowCount');
+  if (storedRows) rows = parseInt(storedRows); // ⬅️ hinzugefügt
   }
 }
 
@@ -127,13 +131,41 @@ function createCell(date, rowIdx) {
 function createRow(dates, rowIdx) {
   const row = document.createElement('div');
   row.className = 'calendar-row';
+
   const label = document.createElement('div');
   label.className = 'sendeplatz-cell';
   label.textContent = `Platz ${rowIdx + 1}`;
+  label.style.position = 'relative'; // wichtig für die Button-Positionierung
+
+  // Einfügen-Button
+  const insertBtn = document.createElement('button');
+  insertBtn.className = 'insert-row-btn';
+  insertBtn.textContent = '+';
+  insertBtn.title = 'Zeile hier einfügen';
+  insertBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    insertRow(rowIdx + 1);
+  });
+  label.appendChild(insertBtn);
+
+  // Entfernen-Button
+  const removeBtn = document.createElement('button');
+  removeBtn.className = 'remove-row-btn';
+  removeBtn.title = 'Zeile entfernen';
+  removeBtn.textContent = '×';
+  removeBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (confirm(`Sendeplatz ${rowIdx + 1} wirklich löschen?`)) {
+      removeRow(rowIdx);
+    }
+  });
+  label.appendChild(removeBtn);
+
   row.appendChild(label);
   dates.forEach(date => row.appendChild(createCell(date, rowIdx)));
   return row;
 }
+
 
 function createBeitragElement(text, color, id) {
   const beitrag = document.createElement('div');
@@ -209,6 +241,47 @@ function updateRangeText(start, view) {
       ? startStr
       : `${startStr} – ${endStr}`;
 }
+function insertRow(atIndex) {
+  rows++; // globaler Wert erhöhen
+
+  // Alle Daten ab atIndex um eine Zeile nach unten verschieben
+  const newCalendarData = {};
+  Object.entries(calendarData).forEach(([key, value]) => {
+    const [date, row] = key.split('_');
+    const rowIndex = parseInt(row);
+    if (rowIndex >= atIndex) {
+      const newKey = `${date}_${rowIndex + 1}`;
+      newCalendarData[newKey] = value;
+    } else {
+      newCalendarData[key] = value;
+    }
+  });
+  calendarData = newCalendarData;
+  saveData();
+  updateCalendarView();
+}
+
+function removeRow(atIndex) {
+  if (rows <= 1) return alert("Mindestens eine Zeile muss bestehen bleiben.");
+  rows--;
+
+  const newCalendarData = {};
+  Object.entries(calendarData).forEach(([key, value]) => {
+    const [date, row] = key.split('_');
+    const rowIndex = parseInt(row);
+    if (rowIndex === atIndex) return; // Diese Zeile entfernen
+    if (rowIndex > atIndex) {
+      const newKey = `${date}_${rowIndex - 1}`;
+      newCalendarData[newKey] = value;
+    } else {
+      newCalendarData[key] = value;
+    }
+  });
+  calendarData = newCalendarData;
+  saveData();
+  updateCalendarView();
+}
+
 
 
 function createGrid(startDate, days) {
